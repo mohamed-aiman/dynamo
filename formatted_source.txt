@@ -1,0 +1,819 @@
+Array
+(
+    [db] => mydb
+    [table_names] => Array
+        (
+            [0] => users
+            [1] => sellers
+            [2] => listings
+            [3] => categories
+            [4] => items
+            [5] => images
+            [6] => scales
+            [7] => features
+            [8] => units
+            [9] => items_features
+        )
+
+    [users] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                        )
+
+                )
+
+        )
+
+    [sellers] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  `users_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_sellers_users_idx` (`users_id` ASC),
+  CONSTRAINT `fk_sellers_users`
+    FOREIGN KEY (`users_id`)
+    REFERENCES `mydb`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => users_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [users_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_sellers_users_idx` (`users_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_sellers_users
+                                    [foreign_key] => users_id
+                                    [reference_table] => users
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [listings] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  `sellers_id` INT NOT NULL,
+  `sellers_users_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_listings_sellers1_idx` (`sellers_id` ASC, `sellers_users_id` ASC),
+  CONSTRAINT `fk_listings_sellers1`
+    FOREIGN KEY (`sellers_id` , `sellers_users_id`)
+    REFERENCES `mydb`.`sellers` (`id` , `users_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => sellers_id
+                    [2] => sellers_users_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [sellers_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [sellers_users_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_listings_sellers1_idx` (`sellers_id` ASC, `sellers_users_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_listings_sellers1
+                                    [foreign_key] => sellers_id` , `sellers_users_id
+                                    [reference_table] => sellers
+                                    [reference_column] => id` , `users_id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [categories] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  `categories_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `categories_id`),
+  INDEX `fk_categories_categories1_idx` (`categories_id` ASC),
+  CONSTRAINT `fk_categories_categories1`
+    FOREIGN KEY (`categories_id`)
+    REFERENCES `mydb`.`categories` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => categories_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [categories_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                            [1] => categories_id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_categories_categories1_idx` (`categories_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_categories_categories1
+                                    [foreign_key] => categories_id
+                                    [reference_table] => categories
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [items] => Array
+        (
+            [contents] =>  (
+  `id` INT NULL,
+  `listings_id` BIGINT NOT NULL AUTO_INCREMENT,
+  `categories_id` INT NOT NULL,
+  `status` ENUM('sold', 'delivered', 'hold') NULL,
+  `created_at` DATETIME NULL,
+  `dedede` DECIMAL(10,5) NULL,
+  `uniiiiiii` VARCHAR(225) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_items_listings1_idx` (`listings_id` ASC, `categories_id` ASC),
+  INDEX `fk_items_categories1_idx` (`categories_id` ASC),
+  UNIQUE INDEX `uniiiiiii_UNIQUE` (`uniiiiiii` ASC),
+  CONSTRAINT `fk_items_listings1`
+    FOREIGN KEY (`listings_id` , `categories_id`)
+    REFERENCES `mydb`.`listings` (`id` , `id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_items_categories1`
+    FOREIGN KEY (`categories_id`)
+    REFERENCES `mydb`.`categories` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => listings_id
+                    [2] => categories_id
+                    [3] => status
+                    [4] => created_at
+                    [5] => dedede
+                    [6] => uniiiiiii
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 1
+                        )
+
+                    [listings_id] => Array
+                        (
+                            [type] => BIGINT
+                            [size] => default
+                            [nullable] => 
+                            [auto_increment] => 1
+                        )
+
+                    [categories_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [status] => Array
+                        (
+                            [type] => ENUM
+                            [options] => Array
+                                (
+                                    [0] => 'sold'
+                                    [1] => 'delivered'
+                                    [2] => 'hold'
+                                )
+
+                            [nullable] => 1
+                        )
+
+                    [created_at] => Array
+                        (
+                            [type] => DATETIME
+                            [size] => default
+                            [nullable] => 1
+                        )
+
+                    [dedede] => Array
+                        (
+                            [type] => DECIMAL
+                            [size] => 10,5
+                            [nullable] => 1
+                        )
+
+                    [uniiiiiii] => Array
+                        (
+                            [type] => VARCHAR
+                            [size] => 225
+                            [nullable] => 1
+                            [unique] => 1
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_items_listings1_idx` (`listings_id` ASC, `categories_id` ASC)
+                            [1] =>   INDEX `fk_items_categories1_idx` (`categories_id` ASC)
+                        )
+
+                    [unique] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [name] => uniiiiiii_UNIQUE
+                                    [column] => uniiiiiii
+                                )
+
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_items_listings1
+                                    [foreign_key] => listings_id` , `categories_id
+                                    [reference_table] => listings
+                                    [reference_column] => id` , `id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                            [1] => Array
+                                (
+                                    [constraint] => fk_items_categories1
+                                    [foreign_key] => categories_id
+                                    [reference_table] => categories
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [images] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  `caption` VARCHAR(225) NULL,
+  `url` VARCHAR(45) NULL,
+  `order` INT NULL,
+  `items_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `items_id`),
+  INDEX `fk_images_items1_idx` (`items_id` ASC),
+  CONSTRAINT `fk_images_items1`
+    FOREIGN KEY (`items_id`)
+    REFERENCES `mydb`.`items` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => caption
+                    [2] => url
+                    [3] => order
+                    [4] => items_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [caption] => Array
+                        (
+                            [type] => VARCHAR
+                            [size] => 225
+                            [nullable] => 1
+                        )
+
+                    [url] => Array
+                        (
+                            [type] => VARCHAR
+                            [size] => 45
+                            [nullable] => 1
+                        )
+
+                    [order] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 1
+                        )
+
+                    [items_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                            [1] => items_id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_images_items1_idx` (`items_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_images_items1
+                                    [foreign_key] => items_id
+                                    [reference_table] => items
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [scales] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                        )
+
+                )
+
+        )
+
+    [features] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  `categories_id` INT NOT NULL,
+  `categories_categories_id` INT NOT NULL,
+  `scales_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `categories_id`, `categories_categories_id`),
+  INDEX `fk_features_categories1_idx` (`categories_id` ASC, `categories_categories_id` ASC),
+  INDEX `fk_features_scales1_idx` (`scales_id` ASC),
+  CONSTRAINT `fk_features_categories1`
+    FOREIGN KEY (`categories_id` , `categories_categories_id`)
+    REFERENCES `mydb`.`categories` (`id` , `categories_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_features_scales1`
+    FOREIGN KEY (`scales_id`)
+    REFERENCES `mydb`.`scales` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => categories_id
+                    [2] => categories_categories_id
+                    [3] => scales_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [categories_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [categories_categories_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [scales_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                            [1] => categories_id
+                            [2] => categories_categories_id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_features_categories1_idx` (`categories_id` ASC, `categories_categories_id` ASC)
+                            [1] =>   INDEX `fk_features_scales1_idx` (`scales_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_features_categories1
+                                    [foreign_key] => categories_id` , `categories_categories_id
+                                    [reference_table] => categories
+                                    [reference_column] => id` , `categories_id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                            [1] => Array
+                                (
+                                    [constraint] => fk_features_scales1
+                                    [foreign_key] => scales_id
+                                    [reference_table] => scales
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [units] => Array
+        (
+            [contents] =>  (
+  `id` INT NOT NULL,
+  `scales_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `scales_id`),
+  INDEX `fk_units_scales1_idx` (`scales_id` ASC),
+  CONSTRAINT `fk_units_scales1`
+    FOREIGN KEY (`scales_id`)
+    REFERENCES `mydb`.`scales` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => id
+                    [1] => scales_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [scales_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => id
+                            [1] => scales_id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_units_scales1_idx` (`scales_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_units_scales1
+                                    [foreign_key] => scales_id
+                                    [reference_table] => scales
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [items_features] => Array
+        (
+            [contents] =>  (
+  `items_id` INT NOT NULL,
+  `features_id` INT NOT NULL,
+  `units_id` INT NOT NULL,
+  PRIMARY KEY (`items_id`, `features_id`),
+  INDEX `fk_items_features_features1_idx` (`features_id` ASC),
+  INDEX `fk_items_features_units1_idx` (`units_id` ASC),
+  CONSTRAINT `fk_items_features_items1`
+    FOREIGN KEY (`items_id`)
+    REFERENCES `mydb`.`items` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_items_features_features1`
+    FOREIGN KEY (`features_id`)
+    REFERENCES `mydb`.`features` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_items_features_units1`
+    FOREIGN KEY (`units_id`)
+    REFERENCES `mydb`.`units` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+            [columns] => Array
+                (
+                    [0] => items_id
+                    [1] => features_id
+                    [2] => units_id
+                )
+
+            [columns_meta] => Array
+                (
+                    [items_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [features_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                    [units_id] => Array
+                        (
+                            [type] => INT
+                            [size] => default
+                            [nullable] => 
+                        )
+
+                )
+
+            [indexes] => Array
+                (
+                    [primary_keys] => Array
+                        (
+                            [0] => items_id
+                            [1] => features_id
+                        )
+
+                    [indexes] => Array
+                        (
+                            [0] =>   INDEX `fk_items_features_features1_idx` (`features_id` ASC)
+                            [1] =>   INDEX `fk_items_features_units1_idx` (`units_id` ASC)
+                        )
+
+                    [constraints] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [constraint] => fk_items_features_items1
+                                    [foreign_key] => items_id
+                                    [reference_table] => items
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                            [1] => Array
+                                (
+                                    [constraint] => fk_items_features_features1
+                                    [foreign_key] => features_id
+                                    [reference_table] => features
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                            [2] => Array
+                                (
+                                    [constraint] => fk_items_features_units1
+                                    [foreign_key] => units_id
+                                    [reference_table] => units
+                                    [reference_column] => id
+                                    [on_update] => 
+                                    [on_delete] => 
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
