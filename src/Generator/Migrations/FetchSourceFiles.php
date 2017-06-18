@@ -2,17 +2,18 @@
 
 namespace Generator\Migrations;
 
-use Generator\Markers\Marker;
+use Generator\Contracts\FetcherInterface;
 use Generator\Helpers\Helper;
+use Generator\Markers\Marker;
 
-class FetchSourceFiles
+class FetchSourceFiles implements FetcherInterface
 {
 	use Helper;
 
 	protected $sourceFile;
 	protected $stubs;
 	protected $fileContents;
-	public $formattedSource;
+	protected $formattedSource;
 
 
 	public function __construct($sourceFile)
