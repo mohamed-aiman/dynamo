@@ -19,7 +19,7 @@ class WriteMigrations implements Writable
 
 	public function write()
 	{
-		$contents = $this->prepared->contentsToWrite;
+		$contents = $this->prepared->getContentsToWrite();
 		foreach ($contents as $migration) {
 			$this->classGenerator->compileClass($migration);
 			$data = $this->classGenerator->getCompiledClass();

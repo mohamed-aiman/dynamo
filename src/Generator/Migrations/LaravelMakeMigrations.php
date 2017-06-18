@@ -4,8 +4,9 @@ namespace Generator\Migrations;
 
 use Generator\Contracts\FetcherInterface;
 use Generator\Contracts\MakeableInterface;
+use Generator\Migrations\FetchSourceFiles;
 
-class MakeMigrations implements MakeableInterface
+class LaravelMakeMigrations implements MakeableInterface
 {
 	protected $formattedSource;
 	protected $classArray;

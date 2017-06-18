@@ -36,6 +36,7 @@ class Generator
 
 		$fetch = new FetchSourceFiles($configMigrations['source']);
 		// print_r($fetch->formattedSource);exit();
+		// $make = new MakeMigrations($fetch, $configMigrations['make']);
 		$make = new MakeMigrations($fetch, $configMigrations['make']);
 		// print_r($make->contentsToWrite);exit();
 		$write = new WriteMigrations($this->classGenerator, $make, $this->ouputHandler);
