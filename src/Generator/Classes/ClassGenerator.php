@@ -32,7 +32,7 @@ class ClassGenerator
 	{
 		$string = $this->config["common"]["open"]; 
 		if($this->namespace) {
-			$string .= $this->config["class"]["namespace"] . $this->namespace . PHP_EOL;
+			$string .= $this->config["class"]["namespace"] . $this->namespace .';'. PHP_EOL;
 		}
 		if($this->use) {
 			foreach ($this->use as $classPath) {

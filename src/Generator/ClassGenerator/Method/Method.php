@@ -25,7 +25,7 @@ class Method
 
     protected function generateMethod($data)
     {
-        $this->generatedMethod = $this->visibility . $this->type . $this->name . $this->paramsToString() . $this->body;
+        $this->generatedMethod = $this->visibility . $this->type . 'function ' . $this->name . $this->paramsToString() . $this->body;
     }
 
 
