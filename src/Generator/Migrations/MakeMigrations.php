@@ -10,6 +10,8 @@ class MakeMigrations implements MakeableInterface
 	protected $formattedSource;
 	protected $classArray;
 	protected $contentsToWrite;
+	protected $fakeSecond = 10;
+	protected $fakeMinute = 10;
 
 	protected $defaultSizes = [
 		'VARCHAR' => 225
@@ -140,10 +142,33 @@ class MakeMigrations implements MakeableInterface
         return $path.'/'.$this->getDatePrefix().'_create_'.$name.'_table.php';
     }
 
+    protected function getFakeMinutes()
+    {
+    	if ($this->fakeMinute == 59) {
+    		$this->fakeMinute = 11;
+    	}
+
+    	return $this->fakeMinute;
+    }
+
+    protected function getFakeSeconds()
+    {
+    	if ($this->fakeSecond == 59) {
+    		$this->fakeSecond = 15;
+    		$this->fakeMinute++;
+    	}
+
+    	return $this->fakeSecond++;
+    }
+
+    public function getFakeMinuteSeconds()
+    {
+    	return $this->getFakeMinutes() . $this->getFakeSeconds();
+    }
+
     protected function getDatePrefix()
     {
-    	sleep(1);
-        return date('Y_m_d_His');
+        return date('Y_m_d_Hi') . $this->getFakeMinuteSeconds();
     }
 
 	public function prepareMigrationFiles($tableName, $path)
