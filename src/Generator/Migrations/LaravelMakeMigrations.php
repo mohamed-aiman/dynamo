@@ -4,8 +4,9 @@ namespace Generator\Migrations;
 
 use Generator\Contracts\FetcherInterface;
 use Generator\Contracts\MakeableInterface;
+use Generator\Migrations\FetchSourceFiles;
 
-class MakeMigrations implements MakeableInterface
+class LaravelMakeMigrations implements MakeableInterface
 {
 	protected $formattedSource;
 	protected $classArray;
@@ -160,7 +161,6 @@ class MakeMigrations implements MakeableInterface
 			"visibility"	=> null,
 			"namespace" => "",
 			"uses" => [
-				"Illuminate\Support\Facades\Schema",
 				"Illuminate\Database\Schema\Blueprint",
 				"Illuminate\Database\Migrations\Migration"
 			],
@@ -217,7 +217,7 @@ class MakeMigrations implements MakeableInterface
 	{
 		$body = $this->upMethodBody($tableName);
 		$method = [
-	        'visibility' => '    public',
+	        'visibility' => '	public',
 	        'type'       => null,
 	        'name'       => 'up',
 	        'parameters' => [],
@@ -345,7 +345,7 @@ class MakeMigrations implements MakeableInterface
 	{
 		$body = $this->downMethodBody($tableName);
 		$method = [
-	        'visibility' => '    public',
+	        'visibility' => '	public',
 	        'type'       => null,
 	        'name'       => 'down',
 	        'parameters' => [],

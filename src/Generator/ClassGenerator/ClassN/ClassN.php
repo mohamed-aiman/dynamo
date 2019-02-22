@@ -32,10 +32,12 @@ class ClassN
     protected function openClass()
     {
         $string = '<?php' . PHP_EOL;
-        $string .= $this->namespace . PHP_EOL;
+        if ($this->namespace) {
+            $string .= $this->namespace . ';' . PHP_EOL;
+        }
         if($this->uses) {
             foreach ($this->uses as $uses) {
-                $string .= 'use ' . $uses . PHP_EOL;
+                $string .= 'use ' . $uses . ';' . PHP_EOL;
             }
         }
         $visibility = ($this->visibility) ? $this->visibility . ' ' : null;

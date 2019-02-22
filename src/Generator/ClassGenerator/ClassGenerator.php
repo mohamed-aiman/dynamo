@@ -10,16 +10,12 @@ class ClassGenerator
         public function __construct($data = null)
         {
             $this->controller = new ClassController();
-            if($data) {
-                $this->compileClass($data);
-            }
+            if ($data) $this->compileClass($data);
         }
 
         public function compileClass($data = null)
         {
-            $data = ($data) ? : $this->data;
-
-            $this->controller->makeClass($data);
+            $this->controller->makeClass(($data) ? : $this->data);
         }
 
         public function getCompiledClass()
