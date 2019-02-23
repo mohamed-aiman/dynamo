@@ -335,19 +335,22 @@ class MakeMigrations implements MakeableInterface
 	{
 		$lines = [];
 		$constraints = (isset($this->fetch[$tableName]['indexes']['constraints']) ? $this->fetch[$tableName]['indexes']['constraints'] : null);
+
 		if($constraints) {
-			foreach ($constraints as $foreignKey) {
-				$lines[] = $this->prepareForeignKey($foreignKey);
+			foreach ($constraints as $constraint) {
+				foreach ($constraint['foreign_key'] as $key => $foreignKey) {
+					$lines[] = $this->prepareForeignKey($constraint, $key);
+				}
 			}
 		}
 		return $lines;
 	}
 
-	protected function prepareForeignKey($foreignKeyData)
+	protected function prepareForeignKey($foreignKeyData, $key = 0)
 	{
         $line = '            $table->foreign(';
-        $line .= "'" . $foreignKeyData['foreign_key'] . "')->references(";
-        $line .= "'" . $foreignKeyData['reference_column'] . "')->on(";
+        $line .= "'" . $foreignKeyData['foreign_key'][$key] . "')->references(";
+        $line .= "'" . $foreignKeyData['reference_column'][$key] . "')->on(";
         $line .= "'" . $foreignKeyData['reference_table']  . "')";
         if($foreignKeyData['on_update']) {
         	$line .= PHP_EOL . "            ->onUpdate('" . $foreignKeyData['on_update'] . "')";

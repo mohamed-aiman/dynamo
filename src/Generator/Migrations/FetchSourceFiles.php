@@ -172,7 +172,6 @@ class FetchSourceFiles implements FetcherInterface
 				} 
 				else if(strpos($line, $indexes['CONSTRAINT']['between']['start']) > 0) {
 					$this->formattedSource[$tableName]['indexes']['constraints'][] = $this->getConstraints($line);
-
 					break;
 				}
 				
@@ -228,11 +227,11 @@ class FetchSourceFiles implements FetcherInterface
 		$constraint = [];
 
 		$constraint = trim($this->marker->between('CONSTRAINT `', '`'.PHP_EOL, $line));
-		$foreignKey = trim($this->marker->between('FOREIGN KEY (`', '`)'.PHP_EOL, $line));
+		$foreignKey = $this->multipleRespectively(trim($this->marker->between('FOREIGN KEY (`', '`)'.PHP_EOL, $line)));
 		$halfBeforeTable = 'REFERENCES `'. $this->formattedSource['db'] .'`.`';
 		$referenceTable = trim($this->marker->between($halfBeforeTable, '` (`', $line));
 		$halfWithTable = $halfBeforeTable . $referenceTable . '` (`';
-		$referenceColumn = trim($this->marker->between($halfWithTable, '`)', $line));
+		$referenceColumn = $this->multipleRespectively(trim($this->marker->between($halfWithTable, '`)', $line)));
 		$onDelete = (trim($this->marker->between('ON DELETE ', PHP_EOL, $line)) === 'NO ACTION') ? null : trim($this->marker->between('ON DELETE ', PHP_EOL, $line)) ;
 		$onUpdate = (trim($this->marker->between('ON UPDATE ', PHP_EOL . ')', $line)) === 'NO ACTION') ? null : trim($this->marker->between('ON UPDATE ', PHP_EOL . ')', $line)) ;
 		$constraint = [
@@ -244,6 +243,11 @@ class FetchSourceFiles implements FetcherInterface
 			'on_delete' => $onDelete
 		];
 		return $constraint;
+	}
+
+	protected function multipleRespectively($dirtyForeignKeys)
+	{
+		return explode('`,`',str_replace(' ', '', $dirtyForeignKeys));
 	}
 
 	protected function getPrimaryKey($line)
