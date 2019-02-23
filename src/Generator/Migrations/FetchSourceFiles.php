@@ -53,11 +53,27 @@ class FetchSourceFiles implements FetcherInterface
 
 	public function getDbName()
 	{
+		if (!$dbName = $this->getDbNameByDbCreateStatement()) {
+			$dbName = $this->getDbNameByTableStatement();
+		}
+
+		$this->formattedSource['db'] = $dbName;
+	}
+
+	protected function getDbNameByDbCreateStatement()
+	{
 		$start = $this->stubs['mysql_stubs']['db_name']['between']['start'];
 		$end = $this->stubs['mysql_stubs']['db_name']['between']['end'];
 
-		$dbName = $this->marker->between($start, $end);
-		$this->formattedSource['db'] = $dbName;
+		return $this->marker->between($start, $end);
+	}
+
+	protected function getDbNameByTableStatement()
+	{
+		$start = $this->stubs['mysql_stubs']['db_name']['between_table']['start'];
+		$end = $this->stubs['mysql_stubs']['db_name']['between_table']['end'];
+
+		return $this->marker->between($start, $end);
 	}
 
 	protected function getTables()
