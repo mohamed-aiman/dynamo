@@ -6,6 +6,10 @@ return [
 				"between" => [
 					"start" => "CREATE SCHEMA IF NOT EXISTS `",
 					"end"	=>  "`"
+				],
+				"between_table" => [
+					"start" => "CREATE TABLE IF NOT EXISTS `",
+					"end"	=>  "`"
 				]
 			],
 			"table_names" => [

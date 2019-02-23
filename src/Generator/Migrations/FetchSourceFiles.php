@@ -44,7 +44,7 @@ class FetchSourceFiles implements FetcherInterface
 	public function getFileContents()
 	{
 		try {
-			$this->fileContents = file_get_contents($this->sourceFile);
+			$this->fileContents = PHP_EOL . file_get_contents($this->sourceFile);
 		} catch (Exception $e) {
 			throw new Exception("Error reading source file: $this->sourceFile, " . $e->getMessage());			
 		}
@@ -53,11 +53,27 @@ class FetchSourceFiles implements FetcherInterface
 
 	public function getDbName()
 	{
+		if (!$dbName = $this->getDbNameByDbCreateStatement()) {
+			$dbName = $this->getDbNameByTableStatement();
+		}
+
+		$this->formattedSource['db'] = $dbName;
+	}
+
+	protected function getDbNameByDbCreateStatement()
+	{
 		$start = $this->stubs['mysql_stubs']['db_name']['between']['start'];
 		$end = $this->stubs['mysql_stubs']['db_name']['between']['end'];
 
-		$dbName = $this->marker->between($start, $end);
-		$this->formattedSource['db'] = $dbName;
+		return $this->marker->between($start, $end);
+	}
+
+	protected function getDbNameByTableStatement()
+	{
+		$start = $this->stubs['mysql_stubs']['db_name']['between_table']['start'];
+		$end = $this->stubs['mysql_stubs']['db_name']['between_table']['end'];
+
+		return $this->marker->between($start, $end);
 	}
 
 	protected function getTables()
@@ -156,7 +172,6 @@ class FetchSourceFiles implements FetcherInterface
 				} 
 				else if(strpos($line, $indexes['CONSTRAINT']['between']['start']) > 0) {
 					$this->formattedSource[$tableName]['indexes']['constraints'][] = $this->getConstraints($line);
-
 					break;
 				}
 				
@@ -212,11 +227,11 @@ class FetchSourceFiles implements FetcherInterface
 		$constraint = [];
 
 		$constraint = trim($this->marker->between('CONSTRAINT `', '`'.PHP_EOL, $line));
-		$foreignKey = trim($this->marker->between('FOREIGN KEY (`', '`)'.PHP_EOL, $line));
+		$foreignKey = $this->multipleRespectively(trim($this->marker->between('FOREIGN KEY (`', '`)'.PHP_EOL, $line)));
 		$halfBeforeTable = 'REFERENCES `'. $this->formattedSource['db'] .'`.`';
 		$referenceTable = trim($this->marker->between($halfBeforeTable, '` (`', $line));
 		$halfWithTable = $halfBeforeTable . $referenceTable . '` (`';
-		$referenceColumn = trim($this->marker->between($halfWithTable, '`)', $line));
+		$referenceColumn = $this->multipleRespectively(trim($this->marker->between($halfWithTable, '`)', $line)));
 		$onDelete = (trim($this->marker->between('ON DELETE ', PHP_EOL, $line)) === 'NO ACTION') ? null : trim($this->marker->between('ON DELETE ', PHP_EOL, $line)) ;
 		$onUpdate = (trim($this->marker->between('ON UPDATE ', PHP_EOL . ')', $line)) === 'NO ACTION') ? null : trim($this->marker->between('ON UPDATE ', PHP_EOL . ')', $line)) ;
 		$constraint = [
@@ -228,6 +243,11 @@ class FetchSourceFiles implements FetcherInterface
 			'on_delete' => $onDelete
 		];
 		return $constraint;
+	}
+
+	protected function multipleRespectively($dirtyForeignKeys)
+	{
+		return explode('`,`',str_replace(' ', '', $dirtyForeignKeys));
 	}
 
 	protected function getPrimaryKey($line)
