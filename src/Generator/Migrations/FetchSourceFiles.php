@@ -44,7 +44,7 @@ class FetchSourceFiles implements FetcherInterface
 	public function getFileContents()
 	{
 		try {
-			$this->fileContents = file_get_contents($this->sourceFile);
+			$this->fileContents = PHP_EOL . file_get_contents($this->sourceFile);
 		} catch (Exception $e) {
 			throw new Exception("Error reading source file: $this->sourceFile, " . $e->getMessage());			
 		}
