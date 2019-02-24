@@ -5,7 +5,8 @@ namespace Generator\Migrations;
 use Generator\Contracts\FetcherInterface;
 use Generator\Helpers\Helper;
 use Generator\Markers\Marker;
-// use SqlFormatter;
+use Generator\Migrations\FetchTable;
+use SqlFormatter;
 
 class FetchSourceFiles implements FetcherInterface
 {
@@ -45,11 +46,10 @@ class FetchSourceFiles implements FetcherInterface
 	public function getFileContents()
 	{
 		try {
-			$raw = PHP_EOL . file_get_contents($this->sourceFile);
-			$this->fileContents = $raw;
-			// $this->fileContents = SqlFormatter::removeComments($raw);
+			$cleaned = PHP_EOL . file_get_contents($this->sourceFile);
+			$this->fileContents = SqlFormatter::removeComments($cleaned);
 		} catch (Exception $e) {
-			throw new Exception("Error reading source file: $this->sourceFile, " . $e->getMessage());			
+			throw new Exception("Error reading source file: $this->sourceFile, " . $e->getMessage());
 		}
 		return $this->fileContents;
 	}
@@ -163,39 +163,35 @@ class FetchSourceFiles implements FetcherInterface
 
 	protected function getTableNames($dbName = null)
 	{
-		$dbName = ($dbName) ? : $this->formattedSource['db'];
-		$temp = [];
-		foreach ($this->stubs['mysql_stubs']['table_names'] as $key => $betweenType) {
-			$start = $this->stubs['mysql_stubs']['table_names'][$key]['start'];
-			if ($dbName) {
-				$start = str_replace('{{db_name}}', $dbName, $start);
-			}
-			$this->setDynamicValue($start, $this->stubs['mysql_stubs']['table_names'][$key]['start']);
-			$start = $start;
-			$end = $this->stubs['mysql_stubs']['table_names'][$key]['end'];
-			if ($tableNames = $this->marker->betweenAll($start,$end)) {
-				array_push($temp, $tableNames);
-			}
-		}
-
-		$this->formattedSource['table_names'] = array_values(array_unique(call_user_func_array('array_merge', $temp)));
+		$this->formattedSource['table_names'] = FetchTable::getTableNames($this->fileContents, $dbName);
+		// dd($this->formattedSource['table_names']);
 	}
+
+	// protected function getTableNames($dbName = null)
+	// {
+	// 	$dbName = ($dbName) ? : $this->formattedSource['db'];
+	// 	$temp = [];
+	// 	foreach ($this->stubs['mysql_stubs']['table_names'] as $key => $betweenType) {
+	// 		$start = $this->stubs['mysql_stubs']['table_names'][$key]['start'];
+	// 		if ($dbName) {
+	// 			$start = str_replace('{{db_name}}', $dbName, $start);
+	// 		}
+	// 		$this->setDynamicValue($start, $this->stubs['mysql_stubs']['table_names'][$key]['start']);
+	// 		$start = $start;
+	// 		$end = $this->stubs['mysql_stubs']['table_names'][$key]['end'];
+	// 		if ($tableNames = $this->marker->betweenAll($start,$end)) {
+	// 			array_push($temp, $tableNames);
+	// 		}
+	// 	}
+
+	// 	$this->formattedSource['table_names'] = array_values(array_unique(call_user_func_array('array_merge', $temp)));
+	// }
 
 	protected function getTableContents($tableNames = [])
 	{
 		$tableNames = ($tableNames) ? : $this->formattedSource['table_names'];
-		//prepare
-		foreach ($this->stubs['mysql_stubs']['table_names'] as $key => $betweenType) {
-			$prefix = $this->stubs['mysql_stubs']['table_names'][$key]['start'];
-			$end = $this->stubs['mysql_stubs']['statement_end'];
-			foreach ($tableNames as $tableName) {
-				$new = $prefix . $tableName . '`';
-				$this->setDynamicValue($new, $this->stubs['mysql_stubs'][$tableName . 'contents'][$key]['start']);
-				//get
-				if ($contents = $this->marker->between($new ,$end)) {
-					$this->formattedSource[$tableName]['contents'] = $contents;
-				}
-			}
+		foreach ($tableNames as $tableName) {
+			$this->formattedSource[$tableName]['contents'] = FetchTableContent::getTableContents($this->fileContents, $tableName);
 		}
 	}
 
@@ -240,7 +236,7 @@ class FetchSourceFiles implements FetcherInterface
 		$nullable  = $this->stubs['mysql_stubs']['nullable'];
 		foreach ($ends as $end) {
 			$spaceReplaced = $this->spaceReplaced($end);
-			$whiteSpaceRemovedLine = $this->spaceReplaced($line);		
+			$whiteSpaceRemovedLine = $this->spaceReplaced($line);
 
 			if(strpos($whiteSpaceRemovedLine, $spaceReplaced)) {
 				$autoIncrement = (strpos($whiteSpaceRemovedLine, 'AUTO_INCREMENT') !== false) ? true: false;
@@ -250,13 +246,13 @@ class FetchSourceFiles implements FetcherInterface
 				if(stripos($explode[$last], $notNullable) !== false) {
 					$fieldMeta = trim(explode($notNullable, $explode[$last])[0]);
 					$this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $this->getTypeSizeOptions($fieldMeta, $autoIncrement, false);
-					// $this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $explode[$last];	
+					// $this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $explode[$last];
 				} else if(stripos($explode[$last], $nullable) !== false) {
 					$fieldMeta = trim(explode($nullable, $explode[$last])[0]);
 					$this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $this->getTypeSizeOptions($fieldMeta, $autoIncrement);
 				} else {
 					throw new \Exception("Error: fetching from source: Check whether the field is set for nullable or not, it should be one of them else use this else part to declare that there is something called not declaring anything!!");
-					
+
 				}
 				break;
 			} else {
@@ -269,16 +265,16 @@ class FetchSourceFiles implements FetcherInterface
 					$this->formattedSource[$tableName]['indexes']['unique'][] = $uniqueDetails;
 					$this->addToTableColumnMeta($tableName, $uniqueDetails['column'], 'unique', true);
 					break;
-				} 
+				}
 				else if(strpos($line, $indexes['INDEX']['between']['start']) > 0) {
 					$this->formattedSource[$tableName]['indexes']['indexes'][] = $line;
 					break;
-				} 
+				}
 				else if(strpos($line, $indexes['CONSTRAINT']['between']['start']) > 0) {
 					$this->formattedSource[$tableName]['indexes']['constraints'][] = $this->getConstraints($line);
 					break;
 				}
-				
+
 			}
 		}
 	}
@@ -307,10 +303,10 @@ class FetchSourceFiles implements FetcherInterface
 				if(in_array($type, $decimalTypes)) {
 					$size = $this->marker->between("(", ")", $typeWithSizeOrOptions);
 					array_push($meta, ['type' => $type, 'size' => $size, 'nullable' => $nullable]);
-					
+
 				} else {
 					$optionsRaw = $this->marker->between("(", ")", $typeWithSizeOrOptions);
-					$options = array_map('trim', explode(',', $optionsRaw));				
+					$options = array_map('trim', explode(',', $optionsRaw));
 					array_push($meta, ['type' => $type, 'options' => $options, 'nullable' => $nullable]);
 				}
 			}
@@ -339,8 +335,8 @@ class FetchSourceFiles implements FetcherInterface
 		$onDelete = (trim($this->marker->between('ON DELETE ', PHP_EOL, $line)) === 'NO ACTION') ? null : trim($this->marker->between('ON DELETE ', PHP_EOL, $line)) ;
 		$onUpdate = (trim($this->marker->between('ON UPDATE ', PHP_EOL . ')', $line)) === 'NO ACTION') ? null : trim($this->marker->between('ON UPDATE ', PHP_EOL . ')', $line)) ;
 		$constraint = [
-			'constraint'  => $constraint, 
-			'foreign_key' => $foreignKey, 
+			'constraint'  => $constraint,
+			'foreign_key' => $foreignKey,
 			'reference_table' => $referenceTable,
 			'reference_column'=> $referenceColumn,
 			'on_update' => $onUpdate,
