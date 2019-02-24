@@ -53,11 +53,33 @@ class FetchSourceFiles implements FetcherInterface
 		}
 		return $this->fileContents;
 	}
+	
+	// protected function clear($content)
+	// {
+	// 	$content = SqlFormatter::removeComments($content);
+	// 	$content = explode(';', $content);
+	// 	$content = array_filter($content);
+	// 	$content = implode(';' . PHP_EOL, $content) . ';';
+	// 	return $content;
+	// }
+
 
 	public function getDbName()
 	{
 		if (!$dbName = $this->getDbNameByDbCreateStatement()) {
 			$dbName = $this->getDbNameByTableStatement();
+		}
+
+		if (!$dbName) {
+			$dbName = $this->getDBNamesTheHardWay();
+		}
+
+		if ($dbName) {
+			$this->fileContents = str_replace(
+				"CREATE TABLE IF NOT EXISTS `$dbName`.", 'CREATE TABLE IF NOT EXISTS ', $this->fileContents);
+			$this->fileContents = str_replace(
+				"CREATE TABLE `$dbName`.", 'CREATE TABLE ', $this->fileContents);
+			$this->marker->setContent($this->fileContents);
 		}
 
 		$this->formattedSource['db'] = $dbName;
@@ -78,6 +100,59 @@ class FetchSourceFiles implements FetcherInterface
 
 		return $this->marker->between($start, $end);
 	}
+
+	protected function getDBNamesTheHardWay()
+	{
+		// CREATE TABLE `dbname`.`customers` (
+		$content = $this->fileContents;
+		$content = explode(';', $content);
+		$content = implode(';' . PHP_EOL, $content);
+
+        $dbNames = [];
+        self::iterateOverEachLineInString($content, $dbNames);
+        if (count(array_unique($dbNames)) > 1) {
+        	throw new \Exception("Currently only one databse is allowed");
+        } else if (count(array_unique($dbNames)) == 1) {
+        	return $dbNames[0];
+        }
+
+        return null;
+    }
+    protected function iterateOverEachLineInString($subject, &$contains)
+    {
+        $separator = "\r\n";
+        $line = strtok($subject, $separator);
+        while ($line !== false) {
+            if (self::fetchTableQuery($line) && $dbName = self::havingDbName($line)) {
+                $contains[] = $dbName;
+            }
+            $line = strtok( $separator );
+        }
+    }
+
+	protected function fetchTableQuery($line, $type = 'CREATE')
+    {
+        if (!in_array($type, [
+            'CREATE',
+            'ALTER'
+        ])) {
+            // throw new Exception("Currently fetching for tables allowed only for CREATE, ALTER");
+            throw new Exception("Currently fetching for tables allowed only for CREATE");
+        }
+        if (strpos($line, "$type TABLE ") !== false) {
+            return true;
+        }
+        return false;
+    }
+    protected function havingDbName($line)
+    {
+        if (strpos($line, "`.`") !== false) {
+            return $this->marker->between('`', '`.`', $line);
+        }
+    }
+
+
+
 
 	protected function getTables()
 	{

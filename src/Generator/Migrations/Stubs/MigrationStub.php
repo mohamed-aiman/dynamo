@@ -9,7 +9,7 @@ return [
 				],
 				"between_table" => [
 					"start" => "CREATE TABLE IF NOT EXISTS `",
-					"end"	=>  "`"
+					"end"	=>  "`.`"
 				]
 			],
 			"table_names" => [
