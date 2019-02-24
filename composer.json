@@ -13,11 +13,17 @@
         "symfony/console": ">=4.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "~7.0"
+        "phpunit/phpunit": "~7.0",
+        "symfony/var-dumper": "^4.2"
     },
     "autoload": {
         "psr-4": {
             "Generator\\": "src/Generator/"
         }
+    },
+    "autoload-dev": {
+        "files": [
+            "helpers.php"
+        ]
     }
 }
