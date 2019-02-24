@@ -5,7 +5,7 @@ namespace Generator\Migrations;
 use Generator\Contracts\FetcherInterface;
 use Generator\Helpers\Helper;
 use Generator\Markers\Marker;
-// use SqlFormatter;
+use Exception;
 
 class FetchSourceFiles implements FetcherInterface
 {
@@ -47,22 +47,11 @@ class FetchSourceFiles implements FetcherInterface
 		try {
 			$raw = PHP_EOL . file_get_contents($this->sourceFile);
 			$this->fileContents = $raw;
-			// $this->fileContents = SqlFormatter::removeComments($raw);
 		} catch (Exception $e) {
 			throw new Exception("Error reading source file: $this->sourceFile, " . $e->getMessage());			
 		}
 		return $this->fileContents;
 	}
-	
-	// protected function clear($content)
-	// {
-	// 	$content = SqlFormatter::removeComments($content);
-	// 	$content = explode(';', $content);
-	// 	$content = array_filter($content);
-	// 	$content = implode(';' . PHP_EOL, $content) . ';';
-	// 	return $content;
-	// }
-
 
 	public function getDbName()
 	{
@@ -111,7 +100,7 @@ class FetchSourceFiles implements FetcherInterface
         $dbNames = [];
         self::iterateOverEachLineInString($content, $dbNames);
         if (count(array_unique($dbNames)) > 1) {
-        	throw new \Exception("Currently only one databse is allowed");
+        	throw new Exception("Currently only one databse is allowed");
         } else if (count(array_unique($dbNames)) == 1) {
         	return $dbNames[0];
         }
@@ -150,9 +139,6 @@ class FetchSourceFiles implements FetcherInterface
             return $this->marker->between('`', '`.`', $line);
         }
     }
-
-
-
 
 	protected function getTables()
 	{
@@ -199,20 +185,6 @@ class FetchSourceFiles implements FetcherInterface
 		}
 	}
 
-	// protected function getTableContents($tableNames = [])
-	// {
-	// 	$tableNames = ($tableNames) ? : $this->formattedSource['table_names'];
-	// 	//prepare
-	// 	$prefix = $this->stubs['mysql_stubs']['table_names']['between']['start'];
-	// 	$end = $this->stubs['mysql_stubs']['statement_end'];
-	// 	foreach ($tableNames as $tableName) {
-	// 		$new = $prefix . $tableName . '`';
-	// 		$this->setDynamicValue($new, $this->stubs['mysql_stubs'][$tableName . 'contents']['between']['start']);
-	// 		//get
-	// 		$this->formattedSource[$tableName]['contents'] = $this->marker->between($new ,$end);
-	// 	}
-	// }
-
 	protected function getTablesProperties($tableNames = [])
 	{
 		$tableNames = ($tableNames) ? : $this->formattedSource['table_names'];
@@ -255,7 +227,7 @@ class FetchSourceFiles implements FetcherInterface
 					$fieldMeta = trim(explode($nullable, $explode[$last])[0]);
 					$this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $this->getTypeSizeOptions($fieldMeta, $autoIncrement);
 				} else {
-					throw new \Exception("Error: fetching from source: Check whether the field is set for nullable or not, it should be one of them else use this else part to declare that there is something called not declaring anything!!");
+					throw new Exception("Error: fetching from source: Check whether the field is set for nullable or not, it should be one of them else use this else part to declare that there is something called not declaring anything!!");
 					
 				}
 				break;
