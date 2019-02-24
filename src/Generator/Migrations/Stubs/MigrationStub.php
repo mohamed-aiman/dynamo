@@ -9,21 +9,37 @@ return [
 				],
 				"between_table" => [
 					"start" => "CREATE TABLE IF NOT EXISTS `",
-					"end"	=>  "`"
+					"end"	=>  "`.`"
 				]
 			],
 			"table_names" => [
 				"between" => [
 					"start" => "CREATE TABLE IF NOT EXISTS `{{db_name}}`.`",
 					"end"	=>  "`"
-				]
+				],
+				"between_not_exists" => [
+					"start" => "CREATE TABLE IF NOT EXISTS `",
+					"end"	=>  "`"
+				],
+				"between_simple" => [
+					"start" => "CREATE TABLE `",
+					"end"	=>  "`"
+				],
 			],
 			"{{table_name}}" => [
-					"contents" => [
-						"between" => [
-							"start" => "CREATE TABLE IF NOT EXISTS `{{db_name}}`.`{{table_name}}` (",
-							"end"   => "{{statement_end}}"
-						]
+				"contents" => [
+					"between" => [
+						"start" => "CREATE TABLE IF NOT EXISTS `{{db_name}}`.`{{table_name}}` (",
+						"end"   => "{{statement_end}}"
+					],
+					"between_not_exists" => [
+						"start" => "CREATE TABLE IF NOT EXISTS `{{table_name}}` (",
+						"end"   => "{{statement_end}}"
+					],
+					"between_simple" => [
+						"start" => "CREATE TABLE `{{table_name}}` (",
+						"end"   => "{{statement_end}}"
+					]
 				]
 			],
 			"statement_end" => ';',
