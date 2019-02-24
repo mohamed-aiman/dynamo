@@ -27,6 +27,7 @@ class MakeMigrations implements MakeableInterface
         'TINYINT',
         'INT UNSIGNED',
         'MEDIUMINT UNSIGNED',
+        'DOUBLE',
         'TIMESTAMP',
         'YEAR',
         'TEXT',
@@ -36,7 +37,7 @@ class MakeMigrations implements MakeableInterface
         'BLOB',
         'DATE',
         'DATETIME',
-        'BIGINT'
+        'BIGINT',
     ];
 
     protected $typeMapper = [
@@ -52,6 +53,7 @@ class MakeMigrations implements MakeableInterface
         'TINYINT UNSIGNED' => 'tinyInteger',
         'INT UNSIGNED' => 'integer',
         'MEDIUMINT UNSIGNED' => 'mediumInteger',
+        'DOUBLE' => 'double',
         'TEXT' => 'text',
         'ENUM' => 'enum',
         'DECIMAL' => 'decimal',
@@ -269,13 +271,14 @@ class MakeMigrations implements MakeableInterface
 
 		if(isset($tableSource['columns'])) {
 			foreach ($tableSource['columns'] as $column) {
-				if(in_array($column, $this->fetch[$tableName]['indexes']['primary_keys'])) {
+				if(
+					isset($this->fetch[$tableName]['indexes']['primary_keys']) &&
+				 	in_array($column, $this->fetch[$tableName]['indexes']['primary_keys'])
+				 ) {
 					$lines[] = $this->preparePrimaryKeyColumn($column, $tableSource['columns_meta'][$column], $this->fetch[$tableName]['indexes']);
 				} else {
 					$lines[] = $this->prepareColumn($column, $tableSource['columns_meta'][$column]);
 				}
-
-
 			}
 		} else {
 			throw new \Exception("Error making Migrations: I dont think there should be a table without no columns!!! table: " . $tableName);
@@ -287,12 +290,11 @@ class MakeMigrations implements MakeableInterface
 	{
 		$line = '            $table->';
 
-		$type = $columnMeta['type'];
+		$type = strtoupper($columnMeta['type']);
 		$autoIncrement = (isset($columnMeta['auto_increment']))  ? $columnMeta['auto_increment'] : null;
 		$size = (isset($columnMeta['size']))  ? $columnMeta['size'] : null;
 		$nullable = ($columnMeta['nullable']) ? '->nullable()' : null;
 		$unsigned = '->unsigned()';
-
 		if($autoIncrement) {
 			return $line .= $this->incrementsMapper[$type] . "('" . $columnName . "');";
 		} else {
@@ -307,18 +309,23 @@ class MakeMigrations implements MakeableInterface
 	{
 		$line = '            $table->';
 
-		$type = $columnMeta['type'];
+		$type = strtoupper($columnMeta['type']);
 		$size = (isset($columnMeta['size']))  ? $columnMeta['size'] : null;
 		$options = (isset($columnMeta['options']))  ?  implode(",", ($columnMeta['options'])) : null;
 		$unique = (isset($columnMeta['unique'])) ? '->unique()' : null;
 		$nullable = ($columnMeta['nullable']) ? '->nullable()' : null;
-
 		if(isset($this->typeMapper[$type])) {
 			if(isset($this->defaultSizes[$type]) && $this->defaultSizes[$type] == $size) {
 				$size = null;
 			}
 			if($options) {
-				$line .= $this->typeMapper[$type] . "('" . $columnName . "',[" . $options . "])" . $unique . $nullable . ";";
+				// 	dump($options, 'dddd');
+				// if (is_array($options)) {
+				// 	$line .= $this->typeMapper[$type] . "('" . $columnName . "',[" . $options . "])" . $unique . $nullable . ";";
+				// 	// dump($options, $line);
+				// } else {
+					$line .= $this->typeMapper[$type] . "('" . $columnName . "',[" . $options . "])" . $unique . $nullable . ";";
+				// }
 			} else if($size) {
 				$size = ($size === 'default') ? null : ", " . $size;
 				$line .= $this->typeMapper[$type] . "('" . $columnName . "'". $size . ")" . $unique . $nullable . ";";
@@ -326,7 +333,7 @@ class MakeMigrations implements MakeableInterface
 				$line .= $this->typeMapper[$type] . "('" . $columnName . "')" . $unique . $nullable . ";";
 			}
 		} else {
-			throw new \Exception("Error making Migrations:  add the new complex data condition here for the type " . ((is_array($columnMeta)) ? implode(', ', $columnMeta) : $columnMeta));
+			throw new \Exception("Error making Migrations:  add the new complex data condition here for the type : " . json_encode($columnMeta));
 		}
 		return $line;
 	}

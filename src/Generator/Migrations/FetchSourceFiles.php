@@ -86,29 +86,54 @@ class FetchSourceFiles implements FetcherInterface
 	protected function getTableNames($dbName = null)
 	{
 		$dbName = ($dbName) ? : $this->formattedSource['db'];
-		//prepare
-		$original = $this->stubs['mysql_stubs']['table_names']['between']['start'];
-		$new = str_replace('{{db_name}}', $dbName, $original);
-		$this->setDynamicValue($new, $this->stubs['mysql_stubs']['table_names']['between']['start']);
-		$start = $new;
-		$end = $this->stubs['mysql_stubs']['table_names']['between']['end'];
-		//get
-		$this->formattedSource['table_names'] = $this->marker->betweenAll($start,$end);
+		$temp = [];
+		foreach ($this->stubs['mysql_stubs']['table_names'] as $key => $betweenType) {
+			$start = $this->stubs['mysql_stubs']['table_names'][$key]['start'];
+			if ($dbName) {
+				$start = str_replace('{{db_name}}', $dbName, $start);
+			}
+			$this->setDynamicValue($start, $this->stubs['mysql_stubs']['table_names'][$key]['start']);
+			$start = $start;
+			$end = $this->stubs['mysql_stubs']['table_names'][$key]['end'];
+			if ($tableNames = $this->marker->betweenAll($start,$end)) {
+				array_push($temp, $tableNames);
+			}
+		}
+
+		$this->formattedSource['table_names'] = array_values(array_unique(call_user_func_array('array_merge', $temp)));
 	}
 
 	protected function getTableContents($tableNames = [])
 	{
 		$tableNames = ($tableNames) ? : $this->formattedSource['table_names'];
 		//prepare
-		$prefix = $this->stubs['mysql_stubs']['table_names']['between']['start'];
-		$end = $this->stubs['mysql_stubs']['statement_end'];
-		foreach ($tableNames as $tableName) {
-			$new = $prefix . $tableName . '`';
-			$this->setDynamicValue($new, $this->stubs['mysql_stubs'][$tableName . 'contents']['between']['start']);
-			//get
-			$this->formattedSource[$tableName]['contents'] = $this->marker->between($new ,$end);
+		foreach ($this->stubs['mysql_stubs']['table_names'] as $key => $betweenType) {
+			$prefix = $this->stubs['mysql_stubs']['table_names'][$key]['start'];
+			$end = $this->stubs['mysql_stubs']['statement_end'];
+			foreach ($tableNames as $tableName) {
+				$new = $prefix . $tableName . '`';
+				$this->setDynamicValue($new, $this->stubs['mysql_stubs'][$tableName . 'contents'][$key]['start']);
+				//get
+				if ($contents = $this->marker->between($new ,$end)) {
+					$this->formattedSource[$tableName]['contents'] = $contents;
+				}
+			}
 		}
 	}
+
+	// protected function getTableContents($tableNames = [])
+	// {
+	// 	$tableNames = ($tableNames) ? : $this->formattedSource['table_names'];
+	// 	//prepare
+	// 	$prefix = $this->stubs['mysql_stubs']['table_names']['between']['start'];
+	// 	$end = $this->stubs['mysql_stubs']['statement_end'];
+	// 	foreach ($tableNames as $tableName) {
+	// 		$new = $prefix . $tableName . '`';
+	// 		$this->setDynamicValue($new, $this->stubs['mysql_stubs'][$tableName . 'contents']['between']['start']);
+	// 		//get
+	// 		$this->formattedSource[$tableName]['contents'] = $this->marker->between($new ,$end);
+	// 	}
+	// }
 
 	protected function getTablesProperties($tableNames = [])
 	{
@@ -142,13 +167,14 @@ class FetchSourceFiles implements FetcherInterface
 			if(strpos($whiteSpaceRemovedLine, $spaceReplaced)) {
 				$autoIncrement = (strpos($whiteSpaceRemovedLine, 'AUTO_INCREMENT') !== false) ? true: false;
 				$explode = explode('`', $line);
+				$last = count($explode) - 1;
 				$this->formattedSource[$tableName]['columns'][] = $explode[1];
-				if(stripos($explode[2], $notNullable) !== false) {
-					$fieldMeta = trim(explode($notNullable, $explode[2])[0]);
+				if(stripos($explode[$last], $notNullable) !== false) {
+					$fieldMeta = trim(explode($notNullable, $explode[$last])[0]);
 					$this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $this->getTypeSizeOptions($fieldMeta, $autoIncrement, false);
-					// $this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $explode[2];	
-				} else if(stripos($explode[2], $nullable) !== false) {
-					$fieldMeta = trim(explode($nullable, $explode[2])[0]);
+					// $this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $explode[$last];	
+				} else if(stripos($explode[$last], $nullable) !== false) {
+					$fieldMeta = trim(explode($nullable, $explode[$last])[0]);
 					$this->formattedSource[$tableName]['columns_meta'][$explode[1]] = $this->getTypeSizeOptions($fieldMeta, $autoIncrement);
 				} else {
 					throw new \Exception("Error: fetching from source: Check whether the field is set for nullable or not, it should be one of them else use this else part to declare that there is something called not declaring anything!!");
