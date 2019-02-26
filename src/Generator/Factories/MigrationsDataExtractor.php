@@ -6,64 +6,6 @@ class MigrationsDataExtractor
 {
 	protected $content;
 
-
-    protected $typeMapper = [
-        'VARCHAR' => 'string',
-        'SMALLINT' => 'smallInteger',
-        'SMALLINT UNSIGNED' => 'smallInteger',
-        'BIGINT' => 'bigInteger',
-        'TIMESTAMP' => 'dateTime',
-        'DATE'	=> 'date',
-        'DATETIME' => 'dateTime',
-        'INT' => 'integer',
-        'TINYINT' => 'tinyInteger',
-        'TINYINT UNSIGNED' => 'tinyInteger',
-        'INT UNSIGNED' => 'integer',
-        'MEDIUMINT UNSIGNED' => 'mediumInteger',
-        'DOUBLE' => 'double',
-        'TEXT' => 'text',
-        'ENUM' => 'enum',
-        'DECIMAL' => 'decimal',
-        'SET' => 'enum',
-        'YEAR' => 'smallInteger',
-        'BLOB' => 'text',
-        'CHAR' => 'char'
-    ];
-
-    protected $acceptedTypes = [
-        'bigIncrements', // ->   Incrementing ID (primary key) using a "UNSIGNED BIG INTEGER" equivalent.
-        'bigInteger', // ->   BIGINT equivalent for the database.
-        'binary', // ->BLOB equivalent for the database.
-        'boolean', // ->  BOOLEAN equivalent for the database.
-        'char', // ->   CHAR equivalent with a length.
-        'date', // ->DATE equivalent for the database.
-        'dateTime', // ->DATETIME equivalent for the database.
-        'decimal', // ->   DECIMAL equivalent with a precision and scale.
-        'double', // ->   DOUBLE equivalent with precision, 15 digits in total and 8 after the decimal point.
-        'enum', // ->   ENUM equivalent for the database.
-        'float', // ->   FLOAT equivalent for the database.
-        'increments', // ->  Incrementing ID (primary key) using a "UNSIGNED INTEGER" equivalent.
-        'integer', // ->  INTEGER equivalent for the database.
-        'ipAddress', // ->  IP address equivalent for the database.
-        'json', // ->   JSON equivalent for the database.
-        'jsonb', // ->  JSONB equivalent for the database.
-        'longText', // ->   LONGTEXT equivalent for the database.
-        'macAddress', // ->  MAC address equivalent for the database.
-        'mediumInteger', // ->  MEDIUMINT equivalent for the database.
-        'mediumText', // -> MEDIUMTEXT equivalent for the database.
-        'morphs', // ->Adds INTEGER taggable_id and STRING taggable_type.
-        'nullableTimestamps', // ->  Same as timestamps(), except allows NULLs.
-        'rememberToken', // ->   Adds remember_token as VARCHAR(100) NULL.
-        'smallInteger', // -> SMALLINT equivalent for the database.
-        'softDeletes', // -> Adds deleted_at column for soft deletes.
-        'string', // ->   VARCHAR equivalent column. // ->   VARCHAR equivalent with a length.
-        'text', // ->   TEXT equivalent for the database.
-        'time', // ->   TIME equivalent for the database.
-        'tinyInteger', // ->TINYINT equivalent for the database.
-        'timestamp', // -> TIMESTAMP equivalent for the database. // ->  Adds created_at and updated_at columns.
-        'uuid', // ->UUID equivalent for the database.
-    ];
-
 	public function __construct($migrationFileContent)
 	{
 		$this->content = $migrationFileContent;

@@ -12,7 +12,10 @@ final class FactoriesTest extends TestCase
     	// dd(glob("$migrationsFolder/*"));
 		$fetcher =  new FetchMigrations($migrationsFolder);
 		$compiled = $fetcher->getMigrations()->fetTableData()->getCompiled();
-		dd($compiled);
+        $written = file_put_contents(__DIR__ . '/../migrations_data.txt', print_r($compiled, true));
+        dd($written);
+  //       $factoriesGenerator = new FactoriesGenerator($compiled);
+		// dd($compiled);
 
     }
 }
