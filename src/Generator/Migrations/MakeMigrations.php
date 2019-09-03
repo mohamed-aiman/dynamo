@@ -290,7 +290,11 @@ class MakeMigrations implements MakeableInterface
 				 	in_array($column, $this->fetch[$tableName]['indexes']['primary_keys'])
 				 ) {
 					$lines[] = $this->preparePrimaryKeyColumn($column, $tableSource['columns_meta'][$column], $this->fetch[$tableName]['indexes']);
-				} else {
+				} 
+				else if (isset($tableSource['columns_meta'][$column]['auto_increment'])) {
+					$lines[] = $this->prepareAutoIncrementsColumn($column, $tableSource['columns_meta'][$column]);
+				}
+				else {
 					$lines[] = $this->prepareColumn($column, $tableSource['columns_meta'][$column]);
 				}
 			}
@@ -306,7 +310,6 @@ class MakeMigrations implements MakeableInterface
 
 		return $line .= "'" . implode("','", $compositeKeys) . "');";
 	}
-
 
 	protected function preparePrimaryKeyColumn($columnName, $columnMeta, $indexData)
 	{
@@ -325,7 +328,15 @@ class MakeMigrations implements MakeableInterface
 			}
 			return $line .= $this->typeMapper[$type] . "('" . $columnName . "')" . $unsigned . $nullable . ";";
 		}
-	}					
+	}
+
+	protected function prepareAutoIncrementsColumn($columnName, $columnMeta)
+	{
+		$line = '            $table->';
+
+		$type = strtoupper($columnMeta['type']);
+		return $line .= $this->incrementsMapper[$type] . "('" . $columnName . "');";
+	}							
 
 	protected function prepareColumn($columnName, $columnMeta)
 	{
