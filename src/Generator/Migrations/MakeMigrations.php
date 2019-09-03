@@ -14,7 +14,7 @@ class MakeMigrations implements MakeableInterface
 	protected $fakeMinute = 10;
 
 	protected $defaultSizes = [
-		'VARCHAR' => 225
+		'VARCHAR' => 255
 	];
 
 	protected $types = [
@@ -27,6 +27,7 @@ class MakeMigrations implements MakeableInterface
         'TINYINT',
         'INT UNSIGNED',
         'MEDIUMINT UNSIGNED',
+        'BIGINT UNSIGNED',
         'DOUBLE',
         'TIMESTAMP',
         'YEAR',
@@ -53,6 +54,7 @@ class MakeMigrations implements MakeableInterface
         'TINYINT UNSIGNED' => 'tinyInteger',
         'INT UNSIGNED' => 'integer',
         'MEDIUMINT UNSIGNED' => 'mediumInteger',
+        'BIGINT UNSIGNED' => 'bigInteger',
         'DOUBLE' => 'double',
         'TEXT' => 'text',
         'ENUM' => 'enum',
@@ -99,7 +101,9 @@ class MakeMigrations implements MakeableInterface
 
     protected $incrementsMapper = [
     	'INT' => 'increments',
-    	'BIGINT' => 'bigIncrements'
+    	'BIGINT' => 'bigIncrements',
+    	'INT UNSIGNED' => 'increments',
+    	'BIGINT UNSIGNED' => 'bigIncrements',
     ];
 
 	public function __construct(FetcherInterface $fetch, $config = null)
@@ -352,7 +356,6 @@ class MakeMigrations implements MakeableInterface
 				$size = null;
 			}
 			if($options) {
-				// 	dump($options, 'dddd');
 				// if (is_array($options)) {
 				// 	$line .= $this->typeMapper[$type] . "('" . $columnName . "',[" . $options . "])" . $unique . $nullable . ";";
 				// 	// dump($options, $line);
