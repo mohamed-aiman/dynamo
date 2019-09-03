@@ -257,13 +257,24 @@ class MakeMigrations implements MakeableInterface
 	{
 		$lines[] = '        Schema::create(\'' . $tableName . '\', function(Blueprint $table){';
 		$lines = array_merge($lines, $this->columns($tableName));
-		if(isset($this->fetch[$tableName]['indexes']['composite_primary_keys'])) {
+		$hasCompositeKey = isset($this->fetch[$tableName]['indexes']['composite_primary_keys']);
+		$foreignKeys = $this->foreignKeys($tableName);
+		if($this->config['timestamps_for_all']) {
+			$timeStampsLine = $this->timestamps();
+			//if not last line add empty line after timestamps
+			if ($hasCompositeKey || count($foreignKeys)) {
+				$timeStampsLine .= PHP_EOL;
+			}
+
+			$lines = array_merge($lines, [$timeStampsLine]);
+		}
+		if($hasCompositeKey) {
 			$lines[] = $this->prepareCompositePrimaryKeyColumn($this->fetch[$tableName]['indexes']['composite_primary_keys']);
 		}
-		if($this->config['timestamps_for_all']) {
-		$lines = array_merge($lines, $this->timestamps());
+		if($foreignKeys) {
+			$lines = array_merge($lines, $foreignKeys);
 		}
-		$lines = array_merge($lines, $this->foreignKeys($tableName));
+
 		$lines[] ='        });';
 		return $lines;
 	}
@@ -382,7 +393,7 @@ class MakeMigrations implements MakeableInterface
 
 	protected function timestamps()
 	{
-		$line[] = '            $table->timestamps();' . PHP_EOL;
+		$line = '            $table->timestamps();';
 		return $line;
 	}
 
