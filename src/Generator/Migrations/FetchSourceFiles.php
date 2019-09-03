@@ -233,7 +233,12 @@ class FetchSourceFiles implements FetcherInterface
 				break;
 			} else {
 				if(strpos($line, $indexes['PRIMARY KEY']['between']['start']) > 0) {
-					$this->formattedSource[$tableName]['indexes']['primary_keys'] = $this->getPrimaryKey($line);
+					$primaryKeys = $this->getPrimaryKey($line);
+					if (count($primaryKeys)>1) {
+						$this->formattedSource[$tableName]['indexes']['composite_primary_keys'] = $primaryKeys;
+					} else {
+						$this->formattedSource[$tableName]['indexes']['primary_keys'] = $primaryKeys;
+					}
 					break;
 				}
 				else if(strpos($line, $indexes['UNIQUE INDEX']['between']['start']) > 0) {

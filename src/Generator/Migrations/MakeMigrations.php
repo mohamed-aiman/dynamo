@@ -257,6 +257,9 @@ class MakeMigrations implements MakeableInterface
 	{
 		$lines[] = '        Schema::create(\'' . $tableName . '\', function(Blueprint $table){';
 		$lines = array_merge($lines, $this->columns($tableName));
+		if(isset($this->fetch[$tableName]['indexes']['composite_primary_keys'])) {
+			$lines[] = $this->prepareCompositePrimaryKeyColumn($this->fetch[$tableName]['indexes']['composite_primary_keys']);
+		}
 		if($this->config['timestamps_for_all']) {
 		$lines = array_merge($lines, $this->timestamps());
 		}
@@ -285,6 +288,14 @@ class MakeMigrations implements MakeableInterface
 		}
 		return $lines;
 	}
+
+	protected function prepareCompositePrimaryKeyColumn($compositeKeys)
+	{
+		$line = '            $table->primary(';
+
+		return $line .= "'" . implode("','", $compositeKeys) . "');";
+	}
+
 
 	protected function preparePrimaryKeyColumn($columnName, $columnMeta, $indexData)
 	{
