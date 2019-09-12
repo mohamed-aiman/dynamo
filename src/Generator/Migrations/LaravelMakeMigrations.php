@@ -189,6 +189,9 @@ class LaravelMakeMigrations implements MakeableInterface
 				"Illuminate\Database\Schema\Blueprint",
 				"Illuminate\Database\Migrations\Migration"
 			],
+			"extends" => [
+				"Migration"
+			],
 			'properties' => [],
 		    'methods' => [
 				$up,
