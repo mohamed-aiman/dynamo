@@ -8,6 +8,7 @@ class ClassN
     protected $type;
     protected $namespace;
     protected $uses = [];
+    protected $extends = [];
     protected $properties = [];
     protected $methods = [];
     public $generatedClass;
@@ -19,6 +20,7 @@ class ClassN
         $this->visibility = ($data['visibility']) ? : null;
         $this->namespace = ($data['namespace']) ? : null;
         $this->uses = ($data['uses']) ? : [];
+        $this->extends = ($data['extends']) ? : null;
         $this->properties = ($data['properties']) ? : [];
         $this->methods = ($data['methods']) ? : [];
         $this->makeClass();
@@ -41,7 +43,8 @@ class ClassN
             }
         }
         $visibility = ($this->visibility) ? $this->visibility . ' ' : null;
-        return $string .= PHP_EOL . $visibility . 'class ' . $this->name . PHP_EOL . '{' . PHP_EOL;
+        $extends = ($this->extends) ? ' extends ' . $this->extends . '' : null;
+        return $string .= PHP_EOL . $visibility . 'class ' . $this->name  . $extends . PHP_EOL . '{' . PHP_EOL;
     }
 
     protected function addProperties()
