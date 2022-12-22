@@ -44,7 +44,11 @@ class ClassN
         }
         $visibility = ($this->visibility) ? $this->visibility . ' ' : null;
         $extends = ($this->extends) ? ' extends ' . $this->extends . '' : null;
-        return $string .= PHP_EOL . $visibility . 'class ' . $this->name  . $extends . PHP_EOL . '{' . PHP_EOL;
+        if ($this->type == 'anonymous') {
+            return $string .= PHP_EOL . 'return new class' . $extends . PHP_EOL . '{' . PHP_EOL;
+        } else {
+            return $string .= PHP_EOL . $visibility . 'class ' . $this->name  . $extends . PHP_EOL . '{' . PHP_EOL;
+        }
     }
 
     protected function addProperties()
@@ -59,7 +63,6 @@ class ClassN
 
     protected function closeClass()
     {
-        return PHP_EOL . "}";
-
+        return ($this->type == 'anonymous') ? PHP_EOL . "};" : PHP_EOL . "}";
     }
 }
