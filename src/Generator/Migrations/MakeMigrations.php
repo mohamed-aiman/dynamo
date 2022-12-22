@@ -57,6 +57,7 @@ class MakeMigrations implements MakeableInterface
         'BIGINT UNSIGNED' => 'bigInteger',
         'DOUBLE' => 'double',
         'TEXT' => 'text',
+	'LONGTEXT' => 'longText',
         'ENUM' => 'enum',
         'DECIMAL' => 'decimal',
         'SET' => 'enum',
