@@ -184,11 +184,14 @@ class MakeMigrations implements MakeableInterface
 		$up = $this->createUpMethod($tableName);
 		$drop = $this->createDropMethod($tableName);
 		$fileName = $this->getPath($tableName, $path);
+		
+		//if laravel version is 8.37.0 or greater then use anonymous class
+		$type = version_compare(app()->version(), '8.37.0', '>=') ? 'anonymous' : null;
 
 		$this->contentsToWrite[] = [
 			"file_name" => $fileName,
 			"name"	=> $className,
-			"type"	=> null,
+			"type"	=> $type,
 			"visibility"	=> null,
 			"namespace" => "",
 			"uses" => [
